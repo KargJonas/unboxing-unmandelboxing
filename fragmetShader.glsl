@@ -69,15 +69,17 @@ vec3 calculateColor(vec3 origin, vec3 direction) {
   e *= 0.5;
 
   // Occolusion, maybe?
-  float occ = 1.0
-    + (D(origin + n * 0.02 + vec3(-e, 0, 0))
-    + D(origin + n * 0.02 + vec3(+e, 0, 0))
-    + D(origin + n * 0.02 + vec3(0, - e, 0))
-    + D(origin + n * 0.02 + vec3(0, e, 0))
-    + D(origin + n * 0.02 + vec3(0, 0, - e))
-    + D(origin + n * 0.02 + vec3(0, 0, e)) - 0.03) * 20.0;
+  float occ = 1.0;
 
-  occ = clamp(occ, 0.0, 1.0);
+  // Disabled because I can't tell a difference.
+  // float occ = 1.0
+    // + (D(origin + n * 0.02 + vec3(-e, 0, 0))
+    // + D(origin + n * 0.02 + vec3(+e, 0, 0))
+    // + D(origin + n * 0.02 + vec3(0, - e, 0))
+    // + D(origin + n * 0.02 + vec3(0, e, 0))
+    // + D(origin + n * 0.02 + vec3(0, 0, - e))
+    // + D(origin + n * 0.02 + vec3(0, 0, e)) - 0.03) * 20.0;
+  // occ = clamp(occ, 0.0, 1.0);
 
   float br = (pow(clamp(dot(n, - normalize(direction + vec3(0.3, - 0.9, 0.4))) * 0.6 + 0.4, 0.0, 1.0), 2.7) * 0.8 + 0.2) * occ / (td * 0.5 + 1.0);
 
