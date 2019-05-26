@@ -2,8 +2,10 @@ const cnv = document.querySelector("canvas");
 const gl = cnv.getContext("webgl") || cnv.getContext("experimental-webgl");
 const shaderProgram = gl.createProgram();
 
-const width = 426;
-const height = 240;
+// const width = 426;
+// const height = 240;
+const width = 852;
+const height = 480;
 
 function generateShader(type, shaderText) {
   const shader = gl.createShader(type);
@@ -24,15 +26,14 @@ function update(time) {
 
   gl.viewport(0, 0, width, height);
 
-  gl.uniform4f(
+  gl.uniform1f(
     gl.getUniformLocation(shaderProgram, "time"),
-    time * .00002,
-    0, 0, 0
+    time * .00002
   );
 
   gl.drawArrays(5, 0, 4);
 
-  time += 50;
+  // time += 50;
   requestAnimationFrame(() => update(time));
 }
 

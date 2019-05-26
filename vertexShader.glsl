@@ -1,5 +1,7 @@
-attribute vec2 P;
+attribute vec2 position;
+
 void main(void)
 {
-  gl_Position = vec4(P, 0., 1.);
+  // Just providing the vertex's position to WebGL.
+  gl_Position = vec4(position, 0, 1);
 }
