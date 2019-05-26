@@ -26,7 +26,8 @@ function update(time) {
 
   gl.uniform4f(
     gl.getUniformLocation(shaderProgram, "I"),
-    time * .00002, 0, 0, 0
+    time * .00002,
+    0, 0, 0
   );
 
   gl.drawArrays(5, 0, 4);
@@ -47,9 +48,17 @@ async function run() {
 
   gl.linkProgram(shaderProgram);
   gl.useProgram(shaderProgram);
-  gl.bindBuffer(34962, gl.createBuffer());
-  gl.bufferData(34962, new Float32Array([i = -1, i, i, 1, 1, i, 1, 1]), 35044);
-  gl.vertexAttribPointer(0, 2, 5126, 0, 0, 0);
+
+  const vertices = [
+    -1, -1,
+    -1, +1,
+    +1, -1,
+    +1, +1
+  ];
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+  gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(0);
 
   update(0);
