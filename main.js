@@ -2,6 +2,9 @@ const cnv = document.querySelector("canvas");
 const gl = cnv.getContext("webgl") || cnv.getContext("experimental-webgl");
 const shaderProgram = gl.createProgram();
 
+const width = 426;
+const height = 240;
+
 function generateShader(type, shaderText) {
   const shader = gl.createShader(type);
 
@@ -16,16 +19,13 @@ function generateShader(type, shaderText) {
 }
 
 function update(time) {
-  const width = 426;
-  const height = 240;
-
   cnv.width = width;
   cnv.height = height;
 
   gl.viewport(0, 0, width, height);
 
   gl.uniform4f(
-    gl.getUniformLocation(shaderProgram, "I"),
+    gl.getUniformLocation(shaderProgram, "time"),
     time * .00002,
     0, 0, 0
   );
