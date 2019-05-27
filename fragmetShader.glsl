@@ -47,28 +47,34 @@ float minDistance(vec3 camera) {
 }
 
 vec3 calculateColor(vec3 origin, vec3 direction) {
-  float td = 0.0;
-  float rd = 0.0;
+  float td = 0.0; // I suspect the is the traceled distance from orign
+  float rd = 0.0; // And this is the next safe radius
 
   for(int i = 0; i < 80; i ++ )
+  // for(int i = 0; i < 8; i ++ )
   {
     rd = minDistance(origin);
-    if (rd < pow(td, 1.5) * 0.004)break;
+    if (rd < pow(td, 1.5) * 0.004) break; // !! This makes the fractal morph somehow
 
     td += rd;
     origin += direction * rd;
   }
 
-  float md = minDistance(origin), e = 0.0025;
+  float md = minDistance(origin);
+  // float e = 0.0025;
+
+  // Amount of reflection ray "scattering"
+  float e = 0.0006;
+
   vec3 n = normalize(vec3(
     minDistance(origin + vec3(e, 0, 0)) - minDistance(origin - vec3(e, 0, 0)),
-    minDistance(origin + vec3(0, e, 0))- minDistance(origin - vec3(0, e, 0)),
-    minDistance(origin + vec3(0, 0, e))- minDistance(origin - vec3(0, 0, e))
+    minDistance(origin + vec3(0, e, 0)) - minDistance(origin - vec3(0, e, 0)),
+    minDistance(origin + vec3(0, 0, e)) - minDistance(origin - vec3(0, 0, e))
   ));
 
   e *= 0.5;
 
-  // (not sure) Adding reflected rays to compute average brighness
+  // Adding brightness reflected rays to compute average brighness
   float occ = 1.0
     + (minDistance(origin + n * 0.02 + vec3(-e, 0, 0))
     + minDistance(origin + n * 0.02 + vec3(+e, 0, 0))
@@ -79,18 +85,21 @@ vec3 calculateColor(vec3 origin, vec3 direction) {
 
   occ = clamp(occ, 0.0, 1.0);
 
-  float br = (pow(clamp(dot(n, - normalize(direction + vec3(0.3, - 0.9, 0.4))) * 0.6 + 0.4, 0.0, 1.0), 2.7) * 0.8 + 0.2) * occ / (td * 0.5 + 1.0);
+  float brightness = (pow(clamp(dot(n, - normalize(direction + vec3(0.3, - 0.9, 0.4))) * 0.6 + 0.4, 0.0, 1.0), 2.7) * 0.8 + 0.2) * occ / (td * 0.5 + 1.0);
 
-  float fog = clamp(
-    1.0 / (td * td * 1.8 + 0.4),
-    0.0, 1.0
-  );
+  // float fog = clamp(
+    // 1.0 / (td * td + 1.0),
+    // 0.0, 1.0
+  // );
+
+  // "Fog" effect
+  float fog = 1.0 / (td * td + 1.0);
 
   return mix(
     vec3(
-      br,
-      br / (td * td * 0.2 + 1.0),
-      br / (td + 1.0)
+      brightness,
+      brightness / (td * td * 0.2 + 1.0),
+      brightness / (td + 1.0)
     ),
     vec3(0.0, 0.0, 0.0), 1.0 - fog
   );
@@ -101,8 +110,9 @@ void main() {
   vec2 pos = gl_FragCoord.xy;
 
   // This is needed because of the resolution setting.
-  vec2 screenCenter = vec2(213.0, 120.0);
+  // vec2 screenCenter = vec2(213.0, 120.0);
   // vec2 screenCenter = vec2(426.0, 240.0);
+  vec2 screenCenter = vec2(852.0, 480.0);
 
   // Distance vector between the fragment and the screen center
   vec3 d = vec3((pos - screenCenter) / screenCenter.y, 1.0);

@@ -2,10 +2,13 @@ const cnv = document.querySelector("canvas");
 const gl = cnv.getContext("webgl") || cnv.getContext("experimental-webgl");
 const shaderProgram = gl.createProgram();
 
-const width = 426;
-const height = 240;
+// const width = 426;
+// const height = 240;
 // const width = 852;
 // const height = 480;
+const width = 1704;
+const height = 960;
+const start = Date.now();
 
 const mouse = {
   x: 0,
@@ -30,7 +33,9 @@ function generateShader(type, shaderText) {
   gl.attachShader(shaderProgram, shader);
 }
 
-function update(time) {
+function update() {
+  requestAnimationFrame(() => update());
+
   cnv.width = width;
   cnv.height = height;
 
@@ -38,15 +43,14 @@ function update(time) {
 
   gl.uniform1f(
     gl.getUniformLocation(shaderProgram, "time"),
-    time * .00002
+    // time * .00002
+    (Date.now() - start) * .00002
   );
 
   gl.drawArrays(5, 0, 4);
-
   // time += 50;
   // time -= 50;
   // time = mouse.x * 100;
-  requestAnimationFrame(() => update(time));
 }
 
 async function run() {
@@ -74,7 +78,8 @@ async function run() {
   gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(0);
 
-  update(0);
+  // update(0);
+  update();
 }
 
 run();
