@@ -2,10 +2,20 @@ const cnv = document.querySelector("canvas");
 const gl = cnv.getContext("webgl") || cnv.getContext("experimental-webgl");
 const shaderProgram = gl.createProgram();
 
-// const width = 426;
-// const height = 240;
-const width = 852;
-const height = 480;
+const width = 426;
+const height = 240;
+// const width = 852;
+// const height = 480;
+
+const mouse = {
+  x: 0,
+  y: 0
+}
+
+window.addEventListener("mousemove", (e) => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+})
 
 function generateShader(type, shaderText) {
   const shader = gl.createShader(type);
@@ -34,6 +44,8 @@ function update(time) {
   gl.drawArrays(5, 0, 4);
 
   // time += 50;
+  // time -= 50;
+  // time = mouse.x * 100;
   requestAnimationFrame(() => update(time));
 }
 

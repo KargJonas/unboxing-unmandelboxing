@@ -4,7 +4,7 @@ uniform float time;
 // Good enough
 #define PI 3.1415
 
-// calculateColorotate a point around the Z axis
+// Colorotate a point around the Z axis
 vec3 rotate(vec3 point, float angle) {
   return vec3(
     cos(angle) * point.y + sin(angle) * point.x,
@@ -32,18 +32,18 @@ float F(vec3 P) {
 }
 
 // Distance probably
-float D(vec3 p) {
-  // This seems to be another camera position thing..
+float minDistance(vec3 camera) {
+  // I suppose this is repetition of the fractal
   vec3 c = vec3(10.0, 10.0, 8.0);
 
-  p = mod(p, c) - 0.5 * c;
+  camera = mod(camera, c) - 0.5 * c;
 
-  vec3 q = abs(rotate(p, p.z * PI / 10.0 * 4.0));
+  vec3 q = abs(rotate(camera, camera.z * PI / 10.0 * 4.0));
   float d2 = max(q.z - 10.0, max((q.x * 0.866025 + q.y * 0.5), q.y) - 0.08);
 
-  p = rotate(p, p.z * PI / 10.0 * (length(p.xy) - 3.0) * sin(time * 0.01) * 0.8);
+  camera = rotate(camera, camera.z * PI / 10.0 * (length(camera.xy) - 3.0) * sin(time * 0.01) * 0.8);
 
-  return max(F(p), - d2);
+  return max(F(camera), - d2);
 }
 
 vec3 calculateColor(vec3 origin, vec3 direction) {
@@ -52,30 +52,30 @@ vec3 calculateColor(vec3 origin, vec3 direction) {
 
   for(int i = 0; i < 80; i ++ )
   {
-    rd = D(origin);
+    rd = minDistance(origin);
     if (rd < pow(td, 1.5) * 0.004)break;
 
     td += rd;
     origin += direction * rd;
   }
 
-  float md = D(origin), e = 0.0025;
+  float md = minDistance(origin), e = 0.0025;
   vec3 n = normalize(vec3(
-    D(origin + vec3(e, 0, 0)) - D(origin - vec3(e, 0, 0)),
-    D(origin + vec3(0, e, 0))- D(origin - vec3(0, e, 0)),
-    D(origin + vec3(0, 0, e))- D(origin - vec3(0, 0, e)))
-  );
+    minDistance(origin + vec3(e, 0, 0)) - minDistance(origin - vec3(e, 0, 0)),
+    minDistance(origin + vec3(0, e, 0))- minDistance(origin - vec3(0, e, 0)),
+    minDistance(origin + vec3(0, 0, e))- minDistance(origin - vec3(0, 0, e))
+  ));
 
   e *= 0.5;
 
   // (not sure) Adding reflected rays to compute average brighness
   float occ = 1.0
-    + (D(origin + n * 0.02 + vec3(-e, 0, 0))
-    + D(origin + n * 0.02 + vec3(+e, 0, 0))
-    + D(origin + n * 0.02 + vec3(0, - e, 0))
-    + D(origin + n * 0.02 + vec3(0, e, 0))
-    + D(origin + n * 0.02 + vec3(0, 0, - e))
-    + D(origin + n * 0.02 + vec3(0, 0, e)) - 0.03) * 20.0;
+    + (minDistance(origin + n * 0.02 + vec3(-e, 0, 0))
+    + minDistance(origin + n * 0.02 + vec3(+e, 0, 0))
+    + minDistance(origin + n * 0.02 + vec3(0, - e, 0))
+    + minDistance(origin + n * 0.02 + vec3(0, e, 0))
+    + minDistance(origin + n * 0.02 + vec3(0, 0, - e))
+    + minDistance(origin + n * 0.02 + vec3(0, 0, e)) - 0.03) * 20.0;
 
   occ = clamp(occ, 0.0, 1.0);
 
@@ -101,8 +101,8 @@ void main() {
   vec2 pos = gl_FragCoord.xy;
 
   // This is needed because of the resolution setting.
-  // vec2 screenCenter = vec2(213.0, 120.0);
-  vec2 screenCenter = vec2(426.0, 240.0);
+  vec2 screenCenter = vec2(213.0, 120.0);
+  // vec2 screenCenter = vec2(426.0, 240.0);
 
   // Distance vector between the fragment and the screen center
   vec3 d = vec3((pos - screenCenter) / screenCenter.y, 1.0);
@@ -111,7 +111,8 @@ void main() {
   vec3 cameraPosition = vec3(5.0, 5.0, time * 10.0);
 
   // Amount of fisheye effect
-  float fisheye = 0.9;
+  // float fisheye = 0.9;
+  float fisheye = 0.1;
 
   // Scale (x, y, z) stretches or squishes the scene
   vec3 scale = vec3(1.0, 1.0, 1.0 - (length(d.xy) * fisheye));
